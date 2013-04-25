@@ -8,6 +8,38 @@ nnoremap <silent> <plug>SwapLineBelow :<c-u>call <sid>SwapLine(0, v:count)<cr>
 nnoremap <silent> <plug>MoveLineAbove :<c-u>call <sid>MoveLine(1, v:count)<cr>
 nnoremap <silent> <plug>MoveLineBelow :<c-u>call <sid>MoveLine(0, v:count)<cr>
 
+nnoremap <silent> <plug>PushLineAbove :<c-u>call <sid>PushLine(1, v:count)<cr>
+nnoremap <silent> <plug>PushLineBelow :<c-u>call <sid>PushLine(0, v:count)<cr>
+
+function! s:PushLine(dirUp, count)
+
+    let cnt = (a:count > 1 ? a:count : 1)
+    let curLineNo = line(".")
+
+    if a:dirUp
+        let otherLineNo = curLineNo - cnt - 1
+    else
+        let otherLineNo = curLineNo + cnt - 1
+    endif
+
+    let line1 = getline(curLineNo)
+
+    exe "normal! \"_dd"
+
+    exe "keepjumps normal! ". (a:dirUp ? otherLineNo : otherLineNo) . "G"
+
+    exe "normal! o". line1
+    exe "normal! =="
+
+    exe "keepjumps normal! ". curLineNo . "G"
+
+    if a:dirUp
+        call repeat#set("\<plug>PushLineAbove", cnt)
+    else
+        call repeat#set("\<plug>PushLineBelow", cnt)
+    endif
+endfunction
+
 function! s:MoveLine(dirUp, count)
 
     let cnt = (a:count > 1 ? a:count : 1)
